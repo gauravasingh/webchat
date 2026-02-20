@@ -4,17 +4,11 @@ A Next.js application that provides a web-based chat interface for interacting w
 
 ## Features
 
-- **Multi-LLM Support**: Choose from 8 different LLM providers
-  - OpenAI GPT-3.5
-  - Mistral Large
-  - Minimax ABAB5.5
-  - Anthropic Claude 3.5 Sonnet
-  - Google Gemini 1.5 Flash
-  - xAI Grok Beta
-  - Meta Llama 3.1 (via Together AI)
-  - Microsoft Phi-3 (via Hugging Face)
+- **Configurable Multi-LLM Support**: Easily add and configure support for various LLM providers through a centralized configuration
+  - Currently supports: OpenAI GPT-3.5, Mistral Large, Minimax ABAB5.5, Anthropic Claude 3.5 Sonnet, Google Gemini 1.5 Flash, xAI Grok Beta, Meta Llama 3.1 (via Together AI), and Microsoft Phi-3 (via Hugging Face)
+  - Extensible: Add new LLM providers by updating the configuration object
 - **Real-time Chat Interface**: Interactive chat with streaming responses
-- **Model Selection Dropdown**: Easily switch between LLM providers
+- **Model Selection Dropdown**: Easily switch between configured LLM providers
 - **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
 - **TypeScript Support**: Full type safety throughout the application
 - **Environment Configuration**: Simple `.env.local` setup for API keys
@@ -169,15 +163,16 @@ webchat/
 }
 ```
 
-**Model Options**:
+**Model Options** (configurable in `modelsConfig`):
 - `openai` - OpenAI GPT-3.5
 - `mistral` - Mistral Large
 - `minimax` - Minimax ABAB5.5
-- `claude` - Anthropic Claude
-- `gemini` - Google Gemini
-- `grok` - xAI Grok
-- `llama` - Meta Llama 3.1
-- `phi` - Microsoft Phi-3
+- `claude` - Anthropic Claude 3.5 Sonnet
+- `gemini` - Google Gemini 1.5 Flash
+- `grok` - xAI Grok Beta
+- `llama` - Meta Llama 3.1 (via Together AI)
+- `phi` - Microsoft Phi-3 (via Hugging Face)
+- Additional models can be added by extending the configuration
 
 **Response**:
 ```json
@@ -188,32 +183,36 @@ webchat/
 
 ### Adding a New LLM Provider
 
-To add a new LLM provider:
+To add a new LLM provider, update the `modelsConfig` object in `src/app/api/chat/route.ts`:
 
-1. **Update the UI** in `src/app/page.tsx`:
-   ```tsx
-   <option value="newmodel">New Model</option>
-   ```
-
-2. **Add API handler** in `src/app/api/chat/route.ts`:
+1. **Add a new entry to the `modelsConfig` object**:
    ```typescript
-   else if (model === 'newmodel') {
-     apiUrl = 'https://api.provider.com/chat';
-     headers = {
+   newmodel: {
+     apiUrl: 'https://api.provider.com/v1/chat/completions',
+     headers: {
        'Content-Type': 'application/json',
        'Authorization': `Bearer ${process.env.NEW_MODEL_API_KEY}`,
-     };
-     body = {
+     },
+     body: {
        model: 'model-name',
        messages: [{ role: 'user', content: message }],
-     };
-   }
+     },
+     responsePath: ['choices', 0, 'message', 'content'],
+     apiKeyEnv: 'NEW_MODEL_API_KEY',
+   },
    ```
 
-3. **Add API key** to `.env.example` and `.env.local`:
+2. **Update the UI** in `src/app/page.tsx` to include the new model in the dropdown:
+   ```tsx
+   <option value="newmodel">New Model Name</option>
+   ```
+
+3. **Add the API key** to `.env.example` and `.env.local`:
    ```
    NEW_MODEL_API_KEY=your_key_here
    ```
+
+4. **Update the documentation** in this README to include the new provider in the list and configuration instructions.
 
 ## Building & Deployment
 
