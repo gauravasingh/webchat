@@ -28,6 +28,11 @@
     --background-muted: #050509;
     --border-subtle: rgba(82, 82, 89, 0.6);
   }
+
+  body {
+    background:
+      radial-gradient(circle at top, #050509 0, #050509 40%, #000000 100%);
+  }
 }
 
 body {
